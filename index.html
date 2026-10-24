@@ -466,13 +466,25 @@
                         ${availableCount > 0 ? `
                             <div class="trains-list">
                                 <strong style="color: #333; display: block; margin-bottom: 10px;">
-                                    🎫 找到 ${availableCount} 個符合條件的車次
+                                    ${result.check_method === 'thsr_website' ? 
+                                        `✅ 找到 ${availableCount} 個有座位的車次` :
+                                        result.check_method === 'tdx_timetable' ?
+                                        `⚠️ 找到 ${availableCount} 個符合條件的車次（無法確認座位）` :
+                                        `🔍 找到 ${availableCount} 個車次`
+                                    }
                                 </strong>
-                                ${result.available_trains.map(train => `
-                                    <div class="train-card">
+                                ${result.available_trains.map(train => {
+                                    const isConfirmed = train.available === true;
+                                    const isUnknown = train.available === 'unknown';
+                                    return `
+                                    <div class="train-card" style="border-left-color: ${isConfirmed ? '#28a745' : isUnknown ? '#ffc107' : '#6c757d'}">
                                         <div class="train-info">
                                             <div>
-                                                <div class="train-number">車次 ${escapeHtml(train.train_number)}</div>
+                                                <div class="train-number">
+                                                    車次 ${escapeHtml(train.train_number)}
+                                                    ${isConfirmed ? ' <span style="color: #28a745; font-size: 0.8em;">✓ 有座位</span>' : 
+                                                      isUnknown ? ' <span style="color: #856404; font-size: 0.8em;">? 待確認</span>' : ''}
+                                                </div>
                                                 <div class="train-time">
                                                     ${train.departure_time} 出發 → ${train.arrival_time} 抵達
                                                 </div>
@@ -481,14 +493,26 @@
                                         <a href="${escapeHtml(train.booking_url)}" 
                                            target="_blank" 
                                            class="booking-btn">
-                                            前往訂票
+                                            ${isConfirmed ? '立即訂票' : '前往查詢'}
                                         </a>
                                     </div>
-                                `).join('')}
+                                `}).join('')}
+                                ${result.check_method === 'tdx_timetable' ? `
+                                <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 10px; color: #856404; font-size: 0.9em;">
+                                    ⚠️ 使用時刻表查詢，無法確認實際座位狀態。請點擊「前往查詢」到官網確認。
+                                </div>
+                                ` : ''}
                             </div>
                         ` : `
                             <div style="text-align: center; padding: 20px; color: #666; background: white; border-radius: 10px; margin-top: 15px;">
-                                目前沒有符合條件的車次資訊
+                                ${result.check_method === 'thsr_website' ? 
+                                    '✓ 查詢成功，但目前沒有符合條件的車次或座位已售完' :
+                                    result.check_method === 'tdx_timetable' ?
+                                    '使用時刻表查詢，未找到符合條件的車次' :
+                                    result.check_method === 'failed' ?
+                                    '❌ 所有查詢方法均失敗，請稍後再試' :
+                                    '目前沒有符合條件的車次資訊'
+                                }
                             </div>
                         `}
                     </div>

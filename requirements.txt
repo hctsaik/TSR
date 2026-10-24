@@ -2,3 +2,4 @@ requests>=2.31.0
 pyyaml>=6.0
 ddddocr>=1.4.11
 Pillow>=10.0.0
+beautifulsoup4>=4.12.0
