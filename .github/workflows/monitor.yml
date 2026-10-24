@@ -1,0 +1,58 @@
+name: 高鐵票務監控
+
+on:
+  schedule:
+    # 每 15 分鐘執行一次 (可自行調整)
+    - cron: '*/15 * * * *'
+  
+  workflow_dispatch:  # 允許手動觸發
+  
+  push:
+    branches:
+      - main
+    paths:
+      - 'watches.yml'
+      - 'checker.py'
+      - '.github/workflows/monitor.yml'
+
+jobs:
+  check-tickets:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # 需要寫入權限以提交結果
+    
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v4
+      
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 安裝相依套件
+        run: |
+          pip install -r requirements.txt
+      
+      - name: 執行票務檢查
+        env:
+          # TDX API 憑證 (選用)
+          TDX_CLIENT_ID: ${{ secrets.TDX_CLIENT_ID }}
+          TDX_CLIENT_SECRET: ${{ secrets.TDX_CLIENT_SECRET }}
+          
+          # LINE 通知憑證 (必要)
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: |
+          python checker.py
+      
+      - name: 提交結果
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add results.json
+          git diff --staged --quiet || git commit -m "更新票務檢查結果 $(date +'%Y-%m-%d %H:%M:%S')"
+          git push
+        continue-on-error: true

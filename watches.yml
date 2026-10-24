@@ -1,0 +1,25 @@
+# 台灣高鐵票務監控設定檔
+# 請依照以下格式設定您的監控需求
+
+watches:
+  # 範例 1: 監控特定日期與時間區間的車票
+  - id: watch-1
+    enabled: true
+    travel_date: "2026-11-01"  # 乘車日期 (YYYY-MM-DD)
+    origin: "南港"  # 起站 (南港/台北/板橋/桃園/新竹/苗栗/台中/彰化/雲林/嘉義/台南/左營)
+    destination: "左營"  # 迄站
+    time_range:
+      start: "09:00"  # 最早發車時間
+      end: "12:00"    # 最晚發車時間
+    ticket_count: 2   # 需要的票數
+    seat_class: "標準"  # 座位等級: "標準" 或 "商務"
+    
+  # 範例 2: 監控特定車次
+  # - id: watch-2
+  #   enabled: false
+  #   travel_date: "2026-11-01"
+  #   train_numbers:
+  #     - "813"
+  #     - "815"
+  #   ticket_count: 1
+  #   seat_class: "標準"

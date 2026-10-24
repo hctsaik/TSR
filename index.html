@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣高鐵票務監控系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .status-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-badge.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .status-badge.error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .status-badge strong {
+            margin-right: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .watch-list {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .watch-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .watch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .watch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .watch-id {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .watch-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .watch-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .watch-status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .watch-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .watch-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .trains-list {
+            margin-top: 15px;
+        }
+        
+        .train-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .train-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .train-number {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .train-time {
+            color: #666;
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .booking-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .config-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .config-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .watch-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .train-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚄 台灣高鐵票務監控系統</h1>
+            <p>自動監控高鐵票務，有票即時通知</p>
+        </header>
+        
+        <div class="status">
+            <div class="status-info">
+                <div class="status-badge success" id="lastUpdate">
+                    <strong>最後更新:</strong>
+                    <span id="updateTime">載入中...</span>
+                </div>
+                <div class="status-badge success" id="watchCount">
+                    <strong>監控項目:</strong>
+                    <span id="watchCountValue">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📋 監控項目與結果</h2>
+                <div id="watchResults" class="watch-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>載入資料中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ 設定監控項目</h2>
+                <div class="config-section">
+                    <h3>如何新增監控項目</h3>
+                    <p style="margin-bottom: 15px; color: #666;">
+                        編輯儲存庫中的 <code>watches.yml</code> 檔案，參考以下格式新增您的監控需求：
+                    </p>
+                    <div class="config-example">
+<pre>watches:
+  - id: my-watch-1
+    enabled: true
+    travel_date: "2026-11-01"
+    origin: "台北"
+    destination: "左營"
+    time_range:
+      start: "09:00"
+      end: "12:00"
+    ticket_count: 2
+    seat_class: "標準"</pre>
+                    </div>
+                    <p style="margin-top: 15px; color: #666;">
+                        <strong>可用車站:</strong> 南港、台北、板橋、桃園、新竹、苗栗、台中、彰化、雲林、嘉義、台南、左營<br>
+                        <strong>座位等級:</strong> 標準、商務
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>本系統僅提供票務查詢功能，不會自動訂票或保留座位</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                資料來源: TDX 交通資料流通服務平台 | 台灣高鐵官方網站
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        async function loadResults() {
+            try {
+                const response = await fetch('results.json');
+                if (!response.ok) {
+                    throw new Error('無法載入結果檔案');
+                }
+                
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('載入結果時發生錯誤:', error);
+                document.getElementById('watchResults').innerHTML = `
+                    <div class="no-results">
+                        <p>⚠️ 尚未執行任何檢查，或結果檔案不存在</p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #999;">
+                            請確認 GitHub Actions 已執行並產生結果
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayResults(data) {
+            const lastUpdate = data.last_update;
+            const results = data.results || [];
+            
+            // 更新最後更新時間
+            if (lastUpdate) {
+                const updateDate = new Date(lastUpdate);
+                document.getElementById('updateTime').textContent = 
+                    updateDate.toLocaleString('zh-TW', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+            }
+            
+            // 更新監控項目數量
+            document.getElementById('watchCountValue').textContent = results.length;
+            
+            // 顯示結果
+            if (results.length === 0) {
+                document.getElementById('watchResults').innerHTML = `
+                    <div class="no-results">
+                        <p>📭 目前沒有啟用的監控項目</p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #999;">
+                            請在 watches.yml 中新增監控設定
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            results.forEach(result => {
+                const statusClass = result.status === 'success' ? 'success' : 
+                                  result.status === 'warning' ? 'warning' : 'error';
+                const availableCount = result.available_trains?.length || 0;
+                
+                html += `
+                    <div class="watch-card">
+                        <div class="watch-header">
+                            <div class="watch-id">${escapeHtml(result.watch_id)}</div>
+                            <div class="watch-status ${statusClass}">
+                                ${result.status === 'success' ? '✓ 正常' : 
+                                  result.status === 'warning' ? '⚠ 警告' : '✗ 錯誤'}
+                            </div>
+                        </div>
+                        
+                        <div class="watch-details">
+                            <div class="detail-item">
+                                <span class="detail-label">日期:</span>
+                                <span class="detail-value">${escapeHtml(result.travel_date)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">路線:</span>
+                                <span class="detail-value">${escapeHtml(result.origin)} → ${escapeHtml(result.destination)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">票數:</span>
+                                <span class="detail-value">${result.ticket_count} 張</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">座位:</span>
+                                <span class="detail-value">${escapeHtml(result.seat_class)}車廂</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">檢查時間:</span>
+                                <span class="detail-value">${formatDateTime(result.check_time)}</span>
+                            </div>
+                        </div>
+                        
+                        ${result.error ? `
+                            <div style="background: #f8d7da; padding: 15px; border-radius: 10px; color: #721c24; margin-top: 15px;">
+                                <strong>錯誤訊息:</strong> ${escapeHtml(result.error)}
+                            </div>
+                        ` : ''}
+                        
+                        ${availableCount > 0 ? `
+                            <div class="trains-list">
+                                <strong style="color: #333; display: block; margin-bottom: 10px;">
+                                    🎫 找到 ${availableCount} 個符合條件的車次
+                                </strong>
+                                ${result.available_trains.map(train => `
+                                    <div class="train-card">
+                                        <div class="train-info">
+                                            <div>
+                                                <div class="train-number">車次 ${escapeHtml(train.train_number)}</div>
+                                                <div class="train-time">
+                                                    ${train.departure_time} 出發 → ${train.arrival_time} 抵達
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="${escapeHtml(train.booking_url)}" 
+                                           target="_blank" 
+                                           class="booking-btn">
+                                            前往訂票
+                                        </a>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div style="text-align: center; padding: 20px; color: #666; background: white; border-radius: 10px; margin-top: 15px;">
+                                目前沒有符合條件的車次資訊
+                            </div>
+                        `}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('watchResults').innerHTML = html;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatDateTime(isoString) {
+            if (!isoString) return '未知';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-TW', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // 頁面載入時執行
+        loadResults();
+        
+        // 每 30 秒自動重新載入
+        setInterval(loadResults, 30000);
+    </script>
+</body>
+</html>

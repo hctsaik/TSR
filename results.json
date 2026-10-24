@@ -1,0 +1,17 @@
+{
+  "last_update": "2026-10-24T12:48:36.512338",
+  "results": [
+    {
+      "watch_id": "watch-1",
+      "check_time": "2026-10-24T12:48:36.512318",
+      "travel_date": "2026-11-01",
+      "origin": "南港",
+      "destination": "左營",
+      "ticket_count": 2,
+      "seat_class": "標準",
+      "available_trains": [],
+      "status": "warning",
+      "error": "無法取得時刻表資料"
+    }
+  ]
+}
