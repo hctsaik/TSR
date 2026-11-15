@@ -4,7 +4,7 @@
 watches:
   # 範例 1: 監控特定日期與時間區間的車票
   - id: watch-1
-    enabled: true
+    enabled: false
     travel_date: "2026-11-01"  # 乘車日期 (YYYY-MM-DD)
     origin: "南港"  # 起站 (南港/台北/板橋/桃園/新竹/苗栗/台中/彰化/雲林/嘉義/台南/左營)
     destination: "左營"  # 迄站
